@@ -53,8 +53,9 @@ namespace SAMLTEST.Pages.SP
                 return SendAzureAdRequest(Tenant);
             }
 
+            String TenantId = Tenant.ToLower()?.Replace(".onmicrosoft.com", "");
             string SamlRequest = string.Empty;
-            string b2cloginurl = _configuration["SAMLTEST:b2cloginurl"];
+            string b2cloginurl = TenantId + ".b2clogin.com";
             Policy = Policy.StartsWith("B2C_1A_") ? Policy : "B2C_1A_" + Policy;
             Tenant = (Tenant.ToLower().Contains("onmicrosoft.com") || Tenant.ToLower().Contains(".net")) ? Tenant : Tenant + ".onmicrosoft.com";
             DCInfo = string.IsNullOrWhiteSpace(DCInfo) ? string.Empty : "&" + DCInfo;
@@ -68,7 +69,7 @@ namespace SAMLTEST.Pages.SP
             }
 
             AuthnRequest AuthnReq;
-            string URL = "https://" + b2cloginurl + "/te/" + Tenant + "/" + Policy + "/samlp/sso/login?" + DCInfo;
+            string URL = "https://" + b2cloginurl + "/" + Tenant + "/" + Policy + "/samlp/sso/login?" + DCInfo;
             AuthnReq = new AuthnRequest(URL, SAMLHelper.GetThisURL(this), Issuer);
             string cdoc = SAMLHelper.Compress(AuthnReq.ToString());
             URL = URL + "&SAMLRequest=" + System.Web.HttpUtility.UrlEncode(cdoc) + "&RelayState=" + System.Web.HttpUtility.UrlEncode(RelayState);
